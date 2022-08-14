@@ -9,8 +9,9 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
-      - uses: jefflinse/pr-semver-bump@v1
-        name: Validate Pull Request Metadata
+
+      - name: Validate Pull Request Metadata
+        uses: jefflinse/pr-semver-bump@v1.3.2
         with:
           mode: validate
           repo-token: ${{ secrets.GITHUB_TOKEN }}
