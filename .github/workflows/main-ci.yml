@@ -10,6 +10,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v2
+
       - name: Bump and Tag Version
         id: semverbump
         uses: jefflinse/pr-semver-bump@v1.3.2
