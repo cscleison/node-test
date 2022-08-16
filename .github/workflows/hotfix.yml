@@ -1,0 +1,61 @@
+name: Main CI
+on:
+  push:
+    branches:
+      - hotfix*
+
+jobs:
+  hotfix-ci:
+    name: Hotfix CI
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Tag
+        id: tag
+        run: |
+          git fetch --tags
+          echo Finding the commit id of the parent.
+          PARENT=$(git log --pretty=%P -n 1 $GITHUB_SHA)
+          echo parent commit $PARENT
+          PARENT_TAG=$(git describe --tags $PARENT)
+          echo "::set-output name=parent_tag::$PARENT_TAG"
+          npm i semver@7
+          NEW_TAG=$(npx semver $PARENT_TAG -i patch)-hotfix
+          echo new tag $NEW_TAG
+          echo "::set-output name=new_tag::$NEW_TAG"
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        id: login-ecr-public
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          registry-type: public
+
+      - name: Build, tag, and push image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr-public.outputs.registry }}/u6u0a7r2/node-test
+          IMAGE_TAG: ${{ steps.tag.outputs.new_tag }}
+          PROD_IMAGE_TAG: prod-${{ steps.tag.outputs.new_tag }}
+        run: |
+          docker build -t $ECR_REGISTRY:$IMAGE_TAG -t $ECR_REGISTRY:$PROD_IMAGE_TAG .
+          docker push $ECR_REGISTRY --all-tags
+
+      - name: Tag the current commit in git
+        uses: actions/github-script@v4
+        with:
+          script: |
+            github.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: "refs/tags/${{ steps.tag.outputs.new_tag }}",
+              sha: context.sha
+            })
