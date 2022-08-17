@@ -13,7 +13,7 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            const labels = context.payload?.pull_request?.labels.map((l) => labels.name);
+            const labels = context.payload?.pull_request?.labels.map((l) => l.name);
             console.log("All labels: ", labels);
             const releaseLabels = labels.filter(
               (l) => l === "release/major" || l === "release/minor" || l === "release/patch"
