@@ -14,5 +14,6 @@ jobs:
         id: release-label
 
       - if: ${{ steps.release-label.outputs.level == null }}
-        run: |
-          echo "::error::You must specify a release level: major, minor or patch."
+        uses: actions/github-script@v6
+        with:
+          script: core.setFailed('You must specify a release label level (major, minor or patch)')
