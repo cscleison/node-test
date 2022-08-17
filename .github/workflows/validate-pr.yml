@@ -10,7 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      uses: actions/github-script@v6
+      - uses: actions/github-script@v6
         with:
           script: |
             console.log(github.context.payload?.pull_request?.labels)
