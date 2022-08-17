@@ -1,5 +1,5 @@
 module.exports = ({ github, context }) => {
-  //
+  // aaa
   const labels = context.payload?.pull_request?.labels.map((l) => l.name);
 
   const releaseLabels = labels.filter((l) =>
