@@ -13,7 +13,7 @@ module.exports = async ({ github, context, core }) => {
     console.log(github);
 
     try {
-      const data = github.pulls.get({
+      const data = github.rest.pulls.get({
         owner: context.repo.owner,
         repo: context.repo.repo,
         pull_number: prNumber,
