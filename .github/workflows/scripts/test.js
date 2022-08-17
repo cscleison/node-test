@@ -1,4 +1,4 @@
-module.exports = ({ github, context }) => {
+module.exports = async ({ github, context }) => {
   function extractPRNumber(commitMsg) {
     const squashRegex = /\(#(\d+)\)/;
     const squashMatches = commitMsg.match(squashRegex);
@@ -36,5 +36,5 @@ module.exports = ({ github, context }) => {
     // return;
   }
 
-  return await fetchPR(prNumber);
+  return fetchPR(prNumber);
 };
