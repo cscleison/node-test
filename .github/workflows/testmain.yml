@@ -15,5 +15,5 @@ jobs:
         name: Try run script file
         with:
           script: |
-            const script = require('./scripts/test.js');
+            const script = require('./.github/workflows/scripts/test.js');
             script({github, context});
