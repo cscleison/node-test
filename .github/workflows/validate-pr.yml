@@ -13,10 +13,12 @@ jobs:
       - uses: actions/github-script@v6
         with:
           script: |
-            const labels = context.payload?.pull_request?.labels;
-            console.log(labels);
+            const labels = context.payload?.pull_request?.labels.map((l) => labels.name);
+            console.log("All labels: ", labels);
             const releaseLabels = labels.filter(
               (l) => l === "release/major" || l === "release/minor" || l === "release/patch"
             );
-            console.log("Release labels: ", releaseLabels);
-            if (releaseLabels !== 1) core.setFailed('You must specify a release label level (major, minor or patch).');
+            if (releaseLabels !== 1)
+              core.setFailed(
+                "You must specify a release label level (major, minor or patch)."
+              );
