@@ -1,12 +1,11 @@
-name: Main CI
+name: Hotfix CI
 on:
   push:
     branches:
-      - test*
+      - hotfix*
 
 jobs:
-  main-ci:
-    name: Main CI
+  hotfix-ci:
     runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
@@ -14,7 +13,7 @@ jobs:
           fetch-depth: 5
 
       - uses: actions/github-script@v6
-        name: Find the PR semver level
+        name: Find the semver level of the PR of the current commit
         id: semver-level
         with:
           result-encoding: string
@@ -22,7 +21,7 @@ jobs:
             const script = require('./.github/workflows/scripts/semver-level.js');
             return await script({github, context, core});
 
-      - name: Find the latest tag
+      - name: Find the latest tag in the same branch
         id: latest-tag
         run: |
           git fetch --tags

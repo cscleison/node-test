@@ -49,7 +49,6 @@ module.exports = async ({ github, context, core }) => {
         `Could not extract PR number from the commit message. Commit: ${commitMsg}`
       );
     }
-
     const pr = await fetchPR(prNumber);
     return getSemverLevel(pr);
   } catch (e) {
