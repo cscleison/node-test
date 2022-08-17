@@ -1,0 +1,19 @@
+name: Main CI
+on:
+  push:
+    branches:
+      - test*
+
+jobs:
+  main-ci:
+    name: Main CI
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/github-script@v6
+        name: Try run script file
+        with:
+          script: |
+            const script = require('./scripts/test.js');
+            script({github, context});
