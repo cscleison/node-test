@@ -10,8 +10,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
 
-      - name: Validate Pull Request Metadata
-        uses: jefflinse/pr-semver-bump@v1.3.2
-        with:
-          mode: validate
-          repo-token: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions-ecosystem/action-release-label@v1
+        id: release-label
+
+      - run: echo label ${{ steps.release-label.outputs.level }}
