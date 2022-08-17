@@ -13,4 +13,7 @@ jobs:
       - uses: actions-ecosystem/action-release-label@v1
         id: release-label
 
-      - run: echo label ${{ steps.release-label.outputs.level }}
+      - if: ${{ steps.release-label.outputs.level == null }}
+        run: |
+          "::error::You must specify a release level: major, minor or patch."
+          exit 1
