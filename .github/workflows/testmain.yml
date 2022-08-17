@@ -9,11 +9,28 @@ jobs:
     name: Main CI
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 5
 
       - uses: actions/github-script@v6
-        name: Try run script file
+        name: Find the PR semver level
+        id: semver-level
         with:
+          result-encoding: string
           script: |
-            const script = require('./.github/workflows/scripts/test.js');
-            await script({github, context, core});
+            const script = require('./.github/workflows/scripts/semver-level.js');
+            return await script({github, context, core});
+
+      - name: Find the latest tag
+        id: latest-tag
+        run: |
+          git fetch --tags
+          LATEST_MAIN_TAG=$(git describe --tags --abbrev=0)
+          echo "::set-output name=result::$LATEST_MAIN_TAG"
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.latest-tag.outputs.result }}
+          level: ${{ steps.semver-level.outputs.result }}
