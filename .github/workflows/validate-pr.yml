@@ -11,6 +11,7 @@ jobs:
       - uses: actions/checkout@v2
 
       - uses: actions/github-script@v6
+        name: Check for the release label
         with:
           script: |
             const labels = context.payload?.pull_request?.labels.map((l) => l.name);
