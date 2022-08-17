@@ -29,11 +29,9 @@ module.exports = async ({ github, context }) => {
   const prNumber = extractPRNumber(commitMsg);
 
   if (!prNumber) {
-    throw new Error("Could not extract PR number from the commit message.");
-    // core.setFailed(
-    //   "Could not extract PR number from the commit message."
-    // );
-    // return;
+    return core.setFailed(
+      "Could not extract PR number from the commit message."
+    );
   }
 
   return fetchPR(prNumber);
