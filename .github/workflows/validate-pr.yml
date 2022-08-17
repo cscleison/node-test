@@ -16,4 +16,3 @@ jobs:
       - if: ${{ steps.release-label.outputs.level == null }}
         run: |
           echo "::error::You must specify a release level: major, minor or patch."
-          exit 1
