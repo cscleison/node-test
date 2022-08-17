@@ -16,8 +16,8 @@ jobs:
         id: latest-tag
         run: |
           git fetch --tags
-          LATEST_MAIN_TAG=$(git describe --tags --abbrev=0)
-          echo "::set-output name=result::$LATEST_MAIN_TAG"
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "::set-output name=result::$LATEST_TAG"
 
       - uses: actions-ecosystem/action-bump-semver@v1
         id: bump-semver
