@@ -10,7 +10,7 @@ module.exports = async ({ github, context, core }) => {
   }
 
   async function fetchPR(prNumber) {
-    console.log(github.pulls);
+    console.log(github);
 
     try {
       const data = github.pulls.get({
