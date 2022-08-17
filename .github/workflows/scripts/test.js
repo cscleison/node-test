@@ -21,7 +21,9 @@ module.exports = async ({ github, context, core }) => {
 
       return data;
     } catch (e) {
-      throw new Error(`Failed to fetch data for PR #${prNumber}: ${e.message}`);
+      return core.setFailed(
+        `Failed to fetch data for PR #${prNumber}: ${e.message}`
+      );
     }
   }
 
