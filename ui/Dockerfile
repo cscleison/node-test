@@ -1,12 +1,13 @@
 FROM node:16-alpine
-
-WORKDIR /usr/src/app
+ENV NODE_ENV production
+ENV PORT 80
+WORKDIR /app
 
 COPY package*.json ./
 
 RUN npm ci
 
-COPY . .
+COPY src/ .
 
-EXPOSE 8080
+EXPOSE $PORT
 CMD [ "node", "index.js" ]

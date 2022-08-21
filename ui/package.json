@@ -1,0 +1,8 @@
+{
+  "name": "ui-express",
+  "author": "Cleison Stein",
+  "license": "MIT",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
