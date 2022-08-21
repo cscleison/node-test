@@ -48,7 +48,7 @@ jobs:
         with:
           script: |
             const suffix = "${{ inputs.suffix }}";
-            const toAppend = suffix ? `-${suffix}` : "";
+            const toAppend = suffix?.length ? `-${suffix}` : "";
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
