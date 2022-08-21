@@ -11,7 +11,7 @@ jobs:
     secrets: inherit
 
   git-tag:
-    needs: semver-level
+    needs: build
     name: Tag commit in git
     uses: ./.github/workflows/git-tag.yml
     with:
