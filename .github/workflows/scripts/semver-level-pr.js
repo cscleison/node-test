@@ -1,5 +1,6 @@
 module.exports = async ({ github, context, core }) => {
   // console.log(github);
+  const defaultLevel = "patch";
 
   function extractPrNumber(commitMsg) {
     const squashRegex = /\(#(\d+)\)/;
@@ -31,13 +32,12 @@ module.exports = async ({ github, context, core }) => {
       ["major", "minor", "patch"].includes(l)
     );
 
-    if (!level) {
-      core.warning(
-        "No semver level tag found in the PR for this commit. This will be considered a PATCH."
-      );
-      return "patch";
-    }
-    return level;
+    if (level) return level;
+
+    core.warning(
+      `No semver level tag found in the PR for this commit. Falling back to default level ${defaultLevel}.`
+    );
+    return defaultLevel;
   }
 
   try {
@@ -45,10 +45,12 @@ module.exports = async ({ github, context, core }) => {
     const prNumber = extractPrNumber(commitMsg);
 
     if (!prNumber) {
-      throw new Error(
-        `Could not extract PR number from the commit message. Commit: "${commitMsg}"`
+      core.warning(
+        `Could not extract PR number from the commit message. Commit: "${commitMsg}". Falling back to default level ${defaultLevel}.`
       );
+      return defaultLevel;
     }
+
     const pr = await fetchPR(prNumber);
     return getSemverLevel(pr);
   } catch (e) {

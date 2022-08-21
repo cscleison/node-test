@@ -19,6 +19,7 @@ jobs:
         include:
           - dockerfile: ./ui/Dockerfile
             context: ui
+      # conditionally skip matrix https://github.com/orgs/community/discussions/26253#discussioncomment-3250989
 
     steps:
       - uses: actions/checkout@v3
@@ -36,7 +37,7 @@ jobs:
         with:
           registry-type: public
 
-      - name: Output ECR registry
+      - name: Define ECR registry
         id: registry
         run: echo "::set-output name=result::${{ steps.login-ecr-public.outputs.registry }}/u6u0a7r2/node-test"
 
@@ -45,13 +46,13 @@ jobs:
 
       - name: Define tag
         id: define-tag
-        run: echo "::set-output name=result::${{ matrix.context }}-${{ github.run_attempt }}"
+        run: echo "::set-output name=result::${{ matrix.context }}-${{ github.run_id }}-${{ github.run_attempt }}"
 
       - name: Build and push image
         uses: docker/build-push-action@v3
         with:
-          context: ${{ matrix.context }}
           push: true
+          context: ${{ matrix.context }}
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.registry.outputs.result }}:${{ steps.define-tag.outputs.result }}
           # cache-from: type=gha

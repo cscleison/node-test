@@ -1,0 +1,57 @@
+# Reusable workflow for creating a git tag bumping the semver and adding the
+# ECR images inside this tag
+name: Create git tag
+
+on:
+  workflow_call:
+    inputs:
+      semver-level:
+        description: The semver level (major, minor or patch)
+        required: true
+        type: string
+      suffix:
+        description: Suffix to be added to the tag
+        type: string
+      # TODO docker images
+
+    outputs:
+      new-tag:
+        description: The bumped tag
+        value: ${{ jobs.git-tag.outputs.version }}
+
+jobs:
+  git-tag:
+    name: Bump and create git tag
+    runs-on: ubuntu-20.04
+    outputs:
+      version: ${{ steps.bump-semver.outputs.new_version }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 5
+
+      - name: Find the latest tag in the same branch
+        id: latest-tag
+        run: |
+          git fetch --tags
+          LATEST_TAG=$(git describe --tags --abbrev=0)
+          echo "::set-output name=result::$LATEST_TAG"
+
+      - uses: actions-ecosystem/action-bump-semver@v1
+        id: bump-semver
+        with:
+          current_version: ${{ steps.latest-tag.outputs.result }}
+          level: ${{ inputs.semver-level }}
+
+      - name: Tag the current commit in git
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const suffix = "${{ inputs.suffix }}";
+            const toAppend = suffix ? `-${suffix}` : "";
+            github.rest.git.createRef({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              ref: `refs/tags/${{ steps.bump-semver.outputs.new_version }}${toAppend}`,
+              sha: context.sha
+            });

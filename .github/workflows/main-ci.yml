@@ -10,49 +10,29 @@ jobs:
     uses: ./.github/workflows/build-and-push-images.yml
     secrets: inherit
 
-  # tag:
-  #   needs: build
-  #   name: Main CI
-  #   runs-on: ubuntu-20.04
-  #   steps:
-  #     - uses: actions/checkout@v3
-  #       with:
-  #         fetch-depth: 5
+  semver-level:
+    needs: build
+    name: Find the semver level
+    runs-on: ubuntu-20.04
+    outputs:
+      level: ${{ steps.semver-level.outputs.result }}
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 5
 
-  #     - uses: actions/github-script@v6
-  #       name: Find the semver level of the PR of the latest commit
-  #       id: semver-level
-  #       with:
-  #         result-encoding: string
-  #         script: |
-  #           const script = require('./.github/workflows/scripts/semver-level.js');
-  #           return await script({github, context, core});
+      - uses: actions/github-script@v6
+        name: Find the semver level of the PR of the latest commit
+        id: semver-level
+        with:
+          result-encoding: string
+          script: |
+            const script = require('./.github/workflows/scripts/semver-level-pr.js');
+            return await script({github, context, core});
 
-  #     - name: Find the latest tag in the same branch
-  #       id: latest-tag
-  #       run: |
-  #         git fetch --tags
-  #         LATEST_TAG=$(git describe --tags --abbrev=0)
-  #         echo "::set-output name=result::$LATEST_TAG"
-
-  #     - uses: actions-ecosystem/action-bump-semver@v1
-  #       id: bump-semver
-  #       with:
-  #         current_version: ${{ steps.latest-tag.outputs.result }}
-  #         level: ${{ steps.semver-level.outputs.result }}
-
-  # with:
-  #   aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-  #   aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-  #   aws-region: us-east-1
-
-  # - name: Tag the current commit in git
-  #   uses: actions/github-script@v6
-  #   with:
-  #     script: |
-  #       github.rest.git.createRef({
-  #         owner: context.repo.owner,
-  #         repo: context.repo.repo,
-  #         ref: "refs/tags/${{ steps.bump-semver.outputs.new_version }}",
-  #         sha: context.sha
-  #       })
+  git-tag:
+    needs: semver-level
+    name: Tag commit in git
+    uses: ./.github/workflows/git-tag.yml
+    with:
+      semver-level: ${{ needs.semver-level.outputs.level }}
