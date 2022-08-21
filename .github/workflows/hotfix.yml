@@ -16,3 +16,4 @@ jobs:
     uses: ./.github/workflows/git-tag.yml
     with:
       semver-level: patch
+      suffix: hotfix
