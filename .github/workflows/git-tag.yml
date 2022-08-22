@@ -6,11 +6,8 @@ on:
   workflow_call:
     inputs:
       semver-level:
-        description: The semver level (major, minor or patch)
+        description: The semver level (major, minor, patch or prerelease). Use prerelease for hotfixes.
         required: true
-        type: string
-      suffix:
-        description: Suffix to be added to the tag
         type: string
       # TODO docker images
 
@@ -43,15 +40,25 @@ jobs:
           current_version: ${{ steps.latest-tag.outputs.result }}
           level: ${{ inputs.semver-level }}
 
+      - name: Short SHA
+        id: sha
+        run: echo "::set-output name=short::$(git rev-parse --short HEAD)"
+
       - name: Tag the current commit in git
         uses: actions/github-script@v6
         with:
           script: |
-            const suffix = "${{ inputs.suffix }}";
-            const toAppend = suffix?.length ? `-${suffix}` : "";
+            const bumped = "${{ steps.bump-semver.outputs.new_version }}";
+            const shortSha = "${{ steps.sha.short }}";
+            const attempt = "${{ github.run_attempt }}";
+            console.log(attempt === 1);
+
+            const newTag = `${bumped}+${shortSha}`;
+            console.log(`Previous tag: ${{ steps.latest-tag.outputs.result }}. New tag: ${newTag}`);
+
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${{ steps.bump-semver.outputs.new_version }}${toAppend}`,
+              ref: `refs/tags/${newTag}`,
               sha: context.sha
             });

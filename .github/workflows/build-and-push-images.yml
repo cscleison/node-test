@@ -56,7 +56,8 @@ jobs:
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.registry.outputs.result }}:${{ steps.define-tag.outputs.result }}
           # cache-from: type=gha
-          # cache-to: type=gha,mode=max https://www.nicolabs.net/2021/Speed-up-automated-docker-build-with-github-actions
+          # cache-to: type=gha,mode=max
+          # https://www.nicolabs.net/2021/Speed-up-automated-docker-build-with-github-actions
 
       - name: Output tag
         id: tag
@@ -66,4 +67,5 @@ jobs:
     needs: build-and-push-image
     name: Output images
     runs-on: ubuntu-20.04
-      - run: echo ${{ needs.build-and-push-image.outputs }}
+    steps:
+      - run: echo ${{ toJSON(needs.build-and-push-image.outputs) }}
