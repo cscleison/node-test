@@ -42,15 +42,17 @@ jobs:
 
       - name: Short SHA
         id: sha
-        run: echo "::set-output name=short::$(git rev-parse --short HEAD)"
+        run: |
+          echo $(git rev-parse --short HEAD)
+          echo "::set-output name=short::$(git rev-parse --short HEAD)"
 
       - name: Tag the current commit in git
         uses: actions/github-script@v6
         with:
           script: |
             const bumped = "${{ steps.bump-semver.outputs.new_version }}";
-            const shortSha = "${{ steps.sha.short }}";
-            const attempt = "${{ github.run_attempt }}";
+            const shortSha = "${{ steps.sha.outputs.short }}";
+            const attempt = ${{ github.run_attempt }};
             console.log(attempt === 1);
 
             const newTag = `${bumped}+${shortSha}`;
