@@ -44,9 +44,16 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
+      - name: Short SHA
+        id: sha
+        run: echo "::set-output name=short::$(git rev-parse --short HEAD)"
+
       - name: Define tag
         id: define-tag
-        run: echo "::set-output name=result::${{ matrix.context }}-${{ github.run_id }}-${{ github.run_attempt }}"
+        run: |
+          ATTEMPT=${{ github.run_attempt }}
+          if [ "$ATTEMPT" -gt 1 ]; then SUFFIX="-$ATTEMPT"; else a=""; fi
+          echo "::set-output name=result::${{ matrix.context }}-${{ steps.sha.outputs.short }}$SUFFIX"
 
       - name: Build and push image
         uses: docker/build-push-action@v3
