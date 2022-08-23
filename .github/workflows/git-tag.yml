@@ -6,11 +6,8 @@ on:
   workflow_call:
     inputs:
       semver-level:
-        description: The semver level (major, minor or patch)
+        description: The semver level (major, minor, patch or prerelease). Use prerelease for hotfixes.
         required: true
-        type: string
-      suffix:
-        description: Suffix to be added to the tag
         type: string
       # TODO docker images
 
@@ -47,11 +44,15 @@ jobs:
         uses: actions/github-script@v6
         with:
           script: |
-            const suffix = "${{ inputs.suffix }}";
-            const toAppend = suffix?.length ? `-${suffix}` : "";
+            const bumped = "${{ steps.bump-semver.outputs.new_version }}";
+            const attempt = ${{ github.run_attempt }};
+
+            const newTag = `${bumped}${attempt > 1 ? "+build" + attempt : "" }`;
+            console.log(`Previous tag: ${{ steps.latest-tag.outputs.result }}. New tag: ${newTag}`);
+
             github.rest.git.createRef({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              ref: `refs/tags/${{ steps.bump-semver.outputs.new_version }}${toAppend}`,
+              ref: `refs/tags/${newTag}`,
               sha: context.sha
             });

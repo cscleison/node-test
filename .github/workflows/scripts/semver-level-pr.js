@@ -3,7 +3,7 @@ module.exports = async ({ github, context, core }) => {
   const defaultLevel = "patch";
 
   function extractPrNumber(commitMsg) {
-    const squashRegex = /\(#(\d+)\)/;
+    const squashRegex = /\(#(\d+)\)$/;
     const squashMatches = commitMsg.match(squashRegex);
 
     if (squashMatches?.length > 1) {
@@ -53,6 +53,7 @@ module.exports = async ({ github, context, core }) => {
 
     const pr = await fetchPR(prNumber);
     return getSemverLevel(pr);
+    // TODO return pr title too
   } catch (e) {
     return core.setFailed(e.message);
   }

@@ -4,8 +4,8 @@ name: Build and Push images to ECR
 on:
   workflow_call:
     outputs:
-      ui-tag:
-        description: "The ECR image tag for the ui app"
+      images:
+        description: JSON object as string containing all tags of the built images
         value: ${{ jobs.build-and-push-image.outputs.ui }}
 
 jobs:
@@ -46,7 +46,13 @@ jobs:
 
       - name: Define tag
         id: define-tag
-        run: echo "::set-output name=result::${{ matrix.context }}-${{ github.run_id }}-${{ github.run_attempt }}"
+
+        # TODO apply pr title if exists
+        run: |
+          ATTEMPT=${{ github.run_attempt }}
+          SHORT_SHA=$(git rev-parse --short HEAD)
+          if [ "$ATTEMPT" -gt 1 ]; then SUFFIX="-$ATTEMPT"; else a=""; fi
+          echo "::set-output name=result::${{ matrix.context }}-${SHORT_SHA}$SUFFIX"
 
       - name: Build and push image
         uses: docker/build-push-action@v3
@@ -56,8 +62,16 @@ jobs:
           file: ${{ matrix.dockerfile }}
           tags: ${{ steps.registry.outputs.result }}:${{ steps.define-tag.outputs.result }}
           # cache-from: type=gha
-          # cache-to: type=gha,mode=max https://www.nicolabs.net/2021/Speed-up-automated-docker-build-with-github-actions
+          # cache-to: type=gha,mode=max
+          # https://www.nicolabs.net/2021/Speed-up-automated-docker-build-with-github-actions
 
       - name: Output tag
         id: tag
         run: echo "::set-output name=${{ matrix.context }}::${{ steps.define-tag.outputs.result }}"
+
+  output-images:
+    needs: build-and-push-image
+    name: Output images
+    runs-on: ubuntu-20.04
+    steps:
+      - run: echo ${{ toJSON(needs.build-and-push-image.outputs) }}
