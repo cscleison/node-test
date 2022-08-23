@@ -46,6 +46,8 @@ jobs:
 
       - name: Define tag
         id: define-tag
+
+        # TODO apply pr title if exists
         run: |
           ATTEMPT=${{ github.run_attempt }}
           SHORT_SHA=$(git rev-parse --short HEAD)

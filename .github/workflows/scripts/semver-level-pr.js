@@ -53,6 +53,7 @@ module.exports = async ({ github, context, core }) => {
 
     const pr = await fetchPR(prNumber);
     return getSemverLevel(pr);
+    // TODO return pr title too
   } catch (e) {
     return core.setFailed(e.message);
   }
