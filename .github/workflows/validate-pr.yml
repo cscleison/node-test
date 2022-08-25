@@ -15,4 +15,4 @@ jobs:
         with:
           script: |
             const validate = require('./.github/workflows/scripts/validate-pr.js');
-            validate({github, context});
+            validate({github, context, core});
