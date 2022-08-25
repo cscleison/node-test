@@ -73,4 +73,4 @@ jobs:
         run: |
           TAG=${{ steps.registry.outputs.result }}:${{ steps.define-tag.outputs.result }}
           echo $TAG taggg
-          echo "::set-output name=${{ matrix.context }}::$TAG }}"
+          echo "::set-output name=${{ matrix.context }}::$TAG"
