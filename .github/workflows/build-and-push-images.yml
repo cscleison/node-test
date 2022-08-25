@@ -6,14 +6,14 @@ on:
     outputs:
       ui-image:
         description: JSON object as string containing all tags of the built images
-        value: ${{ jobs.output-tag.outputs.ui }}
+        value: ${{ jobs.build-and-push-image.outputs.ui-image }}
 
 jobs:
   build-and-push-image:
     name: Build and push images to ECR
     runs-on: ubuntu-20.04
     outputs:
-      ui-image: ${{ steps.build-push-image.outputs.ui }}
+      ui-image: ${{ steps.output-tag.outputs.ui }}
 
     strategy:
       fail-fast: true
@@ -71,6 +71,6 @@ jobs:
       - name: Output tag
         id: output-tag
         run: |
-          echo ${{ steps.build-push.outputs.digest }} digest
-          echo ${{ steps.registry.outputs.result }} registry
-          echo "::set-output name=${{ matrix.context }}::${{ steps.build-push.outputs.imageid }}"
+          TAG=${{ steps.registry.outputs.result }}:${{ steps.define-tag.outputs.result }}
+          echo $TAG taggg
+          echo "::set-output name=${{ matrix.context }}::$TAG }}"
