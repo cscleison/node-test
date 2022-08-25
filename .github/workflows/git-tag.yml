@@ -9,7 +9,9 @@ on:
         description: The semver level (major, minor, patch or prerelease). Use prerelease for hotfixes.
         required: true
         type: string
-      # TODO docker images
+      images:
+        description: All docker images split by new lines.
+        type: string
 
     outputs:
       new-tag:
@@ -50,9 +52,21 @@ jobs:
             const newTag = `${bumped}${attempt > 1 ? "+build" + attempt : "" }`;
             console.log(`Previous tag: ${{ steps.latest-tag.outputs.result }}. New tag: ${newTag}`);
 
-            github.rest.git.createRef({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
+            const releaseNotes = "${{ inputs.images }}";
+            const repository = context.repo;
+
+            const tagResponse = await github.rest.git.createTag({
+                owner: repository.owner,
+                repo: repository.repo,
+                tag: newTag,
+                message: releaseNotes,
+                object: context.sha,
+                type: 'commit',
+            });
+
+            await github.rest.git.createRef({
+              owner: repository.owner,
+              repo: repository.repo,
               ref: `refs/tags/${newTag}`,
-              sha: context.sha
+              sha: tagResponse.data.sha,
             });

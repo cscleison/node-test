@@ -31,8 +31,9 @@ jobs:
             return await script({github, context, core});
 
   git-tag:
-    needs: semver-level
+    needs: [build, semver-level]
     name: Tag commit in git
     uses: ./.github/workflows/git-tag.yml
     with:
       semver-level: ${{ needs.semver-level.outputs.level }}
+      images: ${{ needs.build.outputs.ui-image }}
