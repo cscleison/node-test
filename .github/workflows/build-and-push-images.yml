@@ -71,5 +71,6 @@ jobs:
       - name: Output tag
         id: output-tag
         run: |
-          echo ${{ steps.build-push.outputs.imageid }}
+          echo ${{ steps.build-push.outputs.digest }} digest
+          echo ${{ steps.registry.outputs.result }} registry
           echo "::set-output name=${{ matrix.context }}::${{ steps.build-push.outputs.imageid }}"
