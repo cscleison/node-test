@@ -1,4 +1,4 @@
-module.exports = ({ github, context }) => {
+module.exports = ({ github, context, core }) => {
   //
   const labels = context.payload?.pull_request?.labels.map((l) => l.name);
 
