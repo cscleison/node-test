@@ -6,7 +6,7 @@ on:
     outputs:
       ui-image:
         description: JSON object as string containing all tags of the built images
-        value: ${{ jobs.build-and-push-image.outputs.ui-image }}
+        value: ${{ jobs.output-tag.outputs.ui }}
 
 jobs:
   build-and-push-image:
@@ -69,5 +69,7 @@ jobs:
           # https://www.nicolabs.net/2021/Speed-up-automated-docker-build-with-github-actions
 
       - name: Output tag
-        id: tag
-        run: echo "::set-output name=${{ matrix.context }}::${{ steps.build-push.outputs.imageid }}"
+        id: output-tag
+        run: |
+          echo ${{ steps.build-push.outputs.imageid }}
+          echo "::set-output name=${{ matrix.context }}::${{ steps.build-push.outputs.imageid }}"

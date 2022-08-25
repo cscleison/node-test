@@ -52,7 +52,9 @@ jobs:
             const newTag = `${bumped}${attempt > 1 ? "+build" + attempt : "" }`;
             console.log(`Previous tag: ${{ steps.latest-tag.outputs.result }}. New tag: ${newTag}`);
 
+
             const releaseNotes = "${{ inputs.images }}";
+            console.log("Release notes", releaseNotes)
             const repository = context.repo;
 
             const tagResponse = await github.rest.git.createTag({
